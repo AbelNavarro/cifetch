@@ -48,6 +48,7 @@ def main():
     # uncompress all tarballs (bz2)
     for bz2file in glob.glob(artifacts_dir + "/*.tbz"):
         print bz2file
+        os.system("tar jxvf " + bz2file + " --directory " + artifacts_dir)
         
 
 if __name__ == '__main__':
