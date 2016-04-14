@@ -2,6 +2,9 @@
 
 import argparse
 import os
+import urllib2
+import ssl
+import sys
 
 def main():
     parser = argparse.ArgumentParser(description='cifetch - supportconfig fetcher from ci.suse.de')
@@ -11,15 +14,27 @@ def main():
     print "build_number: {}".format(args.build_number)
 
     # If the directory already created for this build?
-    directory="/home/abel/work/ci.suse.de/{}".format(args.build_number)
+    directory = "/home/abel/work/ci.suse.de/{}".format(args.build_number)
     if not os.path.exists(directory):
         os.makedirs(directory)
         print "created directory: " + directory
 
     # Is the zip file already downloaded?
-    filepath=directory + "/artifacts.zip"
-    if not os.path.isfile(filepath):
-      print "file " + filepath + " does not exist"
+    filepath = directory + "/artifacts.zip"
+    if os.path.isfile(filepath):
+        print "file was already downloaded"
+        sys.exit(1)
+ 
+
+    # Download file
+    url = "https://ci.suse.de/job/openstack-mkcloud/{}/artifact/.artifacts/*zip*/.artifacts.zip".format(args.build_number)
+    print "url: " + url
+ 
+    context = ssl._create_unverified_context()       
+    fileurl = urllib2.urlopen(url, context=context)
+    with open(filepath, 'wb') as output:
+        output.write(fileurl.read())
+ 
     # Unzip file regardless of previous content
 
 if __name__ == '__main__':
