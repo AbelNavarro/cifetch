@@ -5,7 +5,7 @@ import os
 import urllib2
 import ssl
 import zipfile
-
+import glob
 
 def main():
     parser = argparse.ArgumentParser(description='cifetch - supportconfig fetcher from ci.suse.de')
@@ -39,8 +39,16 @@ def main():
     zipfile.ZipFile(filepath).extractall(directory)
     print "Unziped file."
 
-    os.symlink(directory + "/.artifacts", directory + "/artifacts")
+    # .artifacts is hard to spot, use a symlink
+    artifacts_dir = directory + "/.artifacts"
+    artifacts_lnk = directory + "/artifacts"
+    if not os.path.exists(artifacts_lnk):
+        os.symlink(artifacts_dir, artifacts_lnk)
 
+    # uncompress all tarballs (bz2)
+    for bz2file in glob.glob(artifacts_dir + "/*.tbz"):
+        print bz2file
+        
 
 if __name__ == '__main__':
     main()
