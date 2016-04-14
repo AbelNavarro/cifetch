@@ -14,9 +14,12 @@ def main():
     directory="/home/abel/work/ci.suse.de/{}".format(args.build_number)
     if not os.path.exists(directory):
         os.makedirs(directory)
+        print "created directory: " + directory
 
     # Is the zip file already downloaded?
-
+    filepath=directory + "/artifacts.zip"
+    if not os.path.isfile(filepath):
+      print "file " + filepath + " does not exist"
     # Unzip file regardless of previous content
 
 if __name__ == '__main__':
