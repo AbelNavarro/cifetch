@@ -7,6 +7,26 @@ import ssl
 import zipfile
 import glob
 
+
+# which-like function, copied from http://stackoverflow.com/a/377028/1753665
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser(description='cifetch - supportconfig fetcher from ci.suse.de')
     parser.add_argument('build_number', type=int, help="Build number, i.e. 28945")
@@ -49,7 +69,20 @@ def main():
     for bz2file in glob.glob(artifacts_dir + "/*.tbz"):
         print bz2file
         os.system("tar jxvf " + bz2file + " --directory " + artifacts_dir)
-        
+    
+    # if split-supportconfig is in the path, split all pluging openstack files
+    if which('split-supportconfig') is not None:
+        print "we can use split-supportconfig"
+        prev_dir = os.getcwd()
+        for root, dirs, files in os.walk(artifacts_dir):
+            for file in files:
+                if file == "plugin-suse_openstack_cloud.txt":
+                    os.chdir(root)
+                    os.system("split-supportconfig " + file)
+
+        os.chdir(prev_dir)
+
+
 
 if __name__ == '__main__':
     main()
