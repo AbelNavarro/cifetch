@@ -71,6 +71,7 @@ def main():
         os.system("tar jxvf " + bz2file + " --directory " + artifacts_dir)
     
     # if split-supportconfig is in the path, split all pluging openstack files
+    # https://github.com/aspiers/SUSE-dist/blob/master/bin/split-supportconfig
     if which('split-supportconfig') is not None:
         print "we can use split-supportconfig"
         prev_dir = os.getcwd()
